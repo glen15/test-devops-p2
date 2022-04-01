@@ -22,3 +22,5 @@ Run the test cases.
 
 To learn Fastify, check out the [Fastify documentation](https://www.fastify.io/docs/latest/).
 # test-devops-p2
+
+"start": "FASTIFY_ADDRESS=0.0.0.0 fastify start -l info -p 80 app.js",
