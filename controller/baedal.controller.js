@@ -1,6 +1,8 @@
 const { MongoClient, ObjectId } = require("mongodb");
 const client = new MongoClient(process.env.DB_CONNECT);
 
+
+
 async function getAllRestaurants(req, reply) {
     try {
         console.log("들어왔나")
@@ -19,11 +21,11 @@ async function getAllReviews(req, reply) {
     try {
         await client.connect();
         const database = client.db('baedal');
-        const id = req.params.id
-        const query = { rastaurants_id: `${id}` }
         const reviews = database.collection('review')
-        // const allReviews = await reviews.findOne(query)
-        const allReviews = await reviews.find(query).toArray()
+
+        const id = req.params.id
+
+        const allReviews = await reviews.find({ restaurants_id: `${id}` }).toArray()
         console.log(allReviews);
         reply.code(200).send(allReviews)
     } finally {
@@ -31,12 +33,32 @@ async function getAllReviews(req, reply) {
     }
 }
 
-// async function addUser(req, reply) {
-//     const users = this.mongo.db.collection("users");
-//     const { name, age } = req.body;
-//     const data = { name, age };
-//     const result = await users.insertOne(data);
-//     reply.code(201).send(result.ops[0]);
-// }
+async function updateReviews(req, reply) {
+    try {
+        await client.connect();
 
-module.exports = { getAllRestaurants, getAllReviews };
+        const database = client.db('baedal');
+        const reviews = database.collection('review')
+
+        const id = req.params.id
+        const comment = req.body.comment
+        const rating = req.body.rating
+
+        const updateData = {
+            $set: {
+                comment,
+                rating,
+            },
+        };
+
+        const updateReview = await reviews.updateOne({ restaurants_id: id }, updateData)
+        console.log(updateReview);
+        reply.code(201).send(updateReview)
+
+    } finally {
+        await client.close();
+    }
+}
+
+
+module.exports = { getAllRestaurants, getAllReviews, updateReviews };
